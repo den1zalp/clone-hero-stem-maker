@@ -1,30 +1,116 @@
-# Stem Maker WinForms
+# Clone Hero Stem Maker
 
-Windows GUI for generating Clone Hero stems from single-audio song folders.
+Clone Hero Stem Maker is a Windows desktop tool that scans Clone Hero song folders and converts single-audio charts into multitrack stem folders.
 
-## What The App Does
+It is an unofficial community tool and is not affiliated with Clone Hero.
 
-- Checks/installs Python 3.12 through `winget`.
-- Checks/installs FFmpeg through `winget`.
-- Creates a local `.venv`.
-- Installs CUDA PyTorch, Demucs, and SoundFile into `.venv`.
-- Scans a Clone Hero `Songs` folder with `ch_stem_batcher.py --dry-run`.
-- Shows processable songs in a checkbox list.
-- Processes only the selected song folders.
-- Cleans `_stem_batcher_backup` folders when the user confirms.
+## What It Does
 
-## Build
+Many Clone Hero charts include only one audio file, such as `song.ogg`, `song.opus`, or `guitar.ogg`.
 
-Install the .NET SDK, then double-click:
+This app can split that single audio file into separate stems:
 
-```text
-Build Release.bat
-```
+- `guitar.ogg`
+- `rhythm.ogg`
+- `song.ogg`
 
-The published GUI will be here:
+The app uses Demucs in the background to separate audio, then prepares the files in a Clone Hero-friendly format.
 
-```text
-bin\Release\net8.0-windows\win-x64\publish\Stem Maker.exe
-```
+## How To Use
 
-Keep `ch_stem_batcher.py` next to the exe. The project copies it automatically on build.
+1. Open `Stem Maker.exe`.
+
+2. Click `Setup runtime`.
+
+   This checks and prepares the required tools:
+
+   - Python 3.12
+   - FFmpeg
+   - PyTorch
+   - Demucs
+   - required Python audio packages
+
+   The runtime is installed under:
+
+   ```text
+   %LOCALAPPDATA%\Stem Maker
+   ```
+
+3. Choose processing mode.
+
+   - `GPU / CUDA`: faster, requires a supported NVIDIA GPU and compatible drivers.
+   - `CPU`: slower, but works on more computers.
+
+4. Click `Browse`.
+
+   Select your Clone Hero songs/charts folder.
+
+   Example:
+
+   ```text
+   D:\CloneHero-win-x64\Windows - Standalone\PlayerData\Songs
+   ```
+
+5. Click `Scan folder`.
+
+   The app scans the selected folder and lists songs that appear to use a single audio file.
+
+   Songs that already look like multitrack charts are skipped.
+
+6. Select the songs you want to process.
+
+   You can use:
+
+   - `Select all`
+   - `Select none`
+   - individual checkboxes in the song list
+
+7. Click `Make stems`.
+
+   The selected songs will be processed one by one.
+
+8. Optional: click `Clean backups`.
+
+   During processing, the app may keep backup folders so the original audio can be restored if needed.
+
+   `Clean backups` removes those backup folders after you confirm everything works.
+
+## Building From Source
+
+Requirements:
+
+- Windows
+- Visual Studio 2022 or newer
+- .NET 8 Desktop Development workload
+
+Steps:
+
+1. Open the project in Visual Studio.
+
+2. Open:
+
+   ```text
+   StemMaker.WinForms.csproj
+   ```
+
+3. Select `Release`.
+
+4. Publish using the included publish profile:
+
+   ```text
+   SingleFile-win-x64
+   ```
+
+5. The output will be a single executable:
+
+   ```text
+   Stem Maker.exe
+   ```
+
+## Notes
+
+- The app itself is a single-file Windows executable.
+- Python, Demucs, and PyTorch are not bundled inside the exe because they are large.
+- They are installed automatically by `Setup runtime`.
+- GPU mode is recommended only for supported NVIDIA GPUs.
+- If GPU mode fails, switch to CPU mode and run setup again.
