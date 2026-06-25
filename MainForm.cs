@@ -847,7 +847,7 @@ public sealed class MainForm : Form
         await RunExclusiveAsync("Processing selected songs...", async token =>
         {
             var songs = _songsText.Text.Trim();
-            var args = $"{Quote(BatcherScript)} --songs {Quote(songs)} --song-dir-file {Quote(selectedFile)} --apply --device {Device}";
+            var args = $"{Quote(BatcherScript)} --songs {Quote(songs)} --song-dir-file {Quote(selectedFile)} --apply --device {Device} --keep-going --verbose";
             await RunProcessAsync(VenvPython, args, token);
         });
     }

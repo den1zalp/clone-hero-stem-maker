@@ -316,6 +316,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ogg-quality", default=6, type=int, help="Vorbis quality, usually 4-8.")
     parser.add_argument("--case-sensitive", action="store_true", help="Make filters case-sensitive.")
     parser.add_argument("--verbose", action="store_true", help="Print external commands.")
+    parser.add_argument("--keep-going", action="store_true", help="Continue with the next song if one song fails.")
     return parser.parse_args()
 
 
@@ -405,10 +406,27 @@ def main() -> int:
         print("No songs to process.")
         return 0
 
-    for song_dir, source in planned:
-        process_song(song_dir, source)
+    processed = 0
+    failed: list[tuple[Path, str]] = []
 
-    print(f"\nDone. Processed {len(planned)} song(s).")
+    for song_dir, source in planned:
+        try:
+            process_song(song_dir, source)
+            processed += 1
+        except Exception as exc:
+            failed.append((song_dir, str(exc)))
+            print(f"ERROR   {song_dir}", file=sys.stderr)
+            print(f"        {exc}", file=sys.stderr)
+            if not ARGS.keep_going:
+                raise
+
+    print(f"\nDone. Processed {processed} song(s).")
+    if failed:
+        print(f"Failed {len(failed)} song(s):", file=sys.stderr)
+        for song_dir, reason in failed:
+            print(f"- {song_dir}: {reason}", file=sys.stderr)
+        return 0 if ARGS.keep_going and processed > 0 else 1
+
     return 0
 
 
